@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require_relative '../utils/i18n'
 
 class AddressNormalizerService
   PREFIXES = %w[r rua av avenida tv travessa psg passagem pç praça].freeze
@@ -17,7 +18,7 @@ class AddressNormalizerService
     [main_address, match[:complement]&.strip]
   end
 
-  def remove_accents(string) = string.downcase.tr('áàâãäéèêëíìîïóòôõöúùûüç()', 'aaaaaeeeiioooouuuuc  ')
+  def remove_accents(string) = I18n.transliterate(string.downcase)
   def remove_very_short_words(string) = string.gsub(/\b[a-zA-Z]{1,2}\b,?\s*/, '').strip
   def normalize_address = remove_accents(@address).gsub(/,\s*|\s+/, '_')
 
