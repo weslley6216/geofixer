@@ -1,0 +1,10 @@
+/config/credentials.json
+/config/token.yml
+
+/logs
+
+/tmp
+
+.byebug_history
+.env
+run_main.sh
