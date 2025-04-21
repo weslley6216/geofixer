@@ -6,6 +6,7 @@ require_relative './services/zip_code_service'
 require_relative './services/google_geocoding_service'
 require_relative './services/log_generator_service'
 require_relative '../app/utils/logger'
+require_relative '../app/utils/i18n'
 require_relative '../app/utils/cache_manager'
 
 class AddressProcessor
@@ -47,6 +48,10 @@ class AddressProcessor
 
   private
 
+  def normalize_for_cache(*address_parts)
+    address_parts.map { |part| I18n.transliterate(part.to_s.downcase).gsub(/[^a-z0-9]/, '_') }.join('_')
+  end
+
   def fetch_street_name_from_zip_code(zip_code)
     Utils::CacheManager.fetch_zip_code(zip_code) ||
       ZipCodeService.fetch_street_name_from_zip_code(zip_code, @zip_code_cache).tap do |zip_code_info|
@@ -55,13 +60,11 @@ class AddressProcessor
   end
 
   def fetch_location(street_name, house_number, zip_code, neighborhood, city)
-    normalizer = AddressNormalizerService.new(street_name)
-    normalized = normalizer.normalize_address
-    cache_key = "#{normalized}_#{house_number}_#{zip_code}_#{neighborhood}_#{city}"
+    cache_key = normalize_for_cache(street_name, house_number, zip_code, neighborhood, city)
 
     Utils::CacheManager.fetch_location(cache_key) ||
-      GoogleGeocodingService.new(normalizer)
-                            .fetch_location_from_google(street_name, house_number, zip_code, neighborhood, city, @zip_code_cache)
+      GoogleGeocodingService.new
+                            .fetch_location_from_google(street_name, house_number, neighborhood, city)
                             .tap { |location| Utils::CacheManager.store_location(cache_key, location) if location }
   end
 

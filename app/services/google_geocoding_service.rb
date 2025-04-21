@@ -4,18 +4,16 @@ require 'httparty'
 require 'uri'
 
 class GoogleGeocodingService
-  def initialize(address_normalizer, api_key = ENV['GOOGLE_API_KEY'])
+  def initialize(api_key = ENV['GOOGLE_API_KEY'])
     @api_key = api_key
-    @address_normalizer = address_normalizer
   end
 
-  def fetch_location_from_google(street_name, house_number, zip_code, neighborhood, city, cache)
+  def fetch_location_from_google(street_name, house_number, neighborhood, city)
     address = "#{street_name}, #{house_number}, #{neighborhood}, #{city}, Brazil"
-    normalized_address = @address_normalizer.normalize_address
-    cache_key = "#{normalized_address}_#{house_number}_#{zip_code}_#{neighborhood}_#{city}"
-
-    cache.fetch(cache_key) { fetch_geocode(address)&.tap { |result| cache[cache_key] = result } }
+    fetch_geocode(address)
   end
+
+  private
 
   def fetch_geocode(address)
     url = "https://maps.googleapis.com/maps/api/geocode/json?address=#{URI::DEFAULT_PARSER.escape(address)}&key=#{@api_key}"
