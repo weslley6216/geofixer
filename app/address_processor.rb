@@ -91,7 +91,11 @@ class AddressProcessor
     else
       Utils::Logger.warn("Trying to correct street name: #{input_street}")
       if (street_info = ZipCodeService.fetch_zip_code_by_street_name(input_street, zip_code_info[:city]))
-        row['Destination Address'] = "#{street_info['logradouro']},#{row['Destination Address'].split(',', 2).last}"
+        street_info = street_info.first if street_info.is_a?(Array)
+
+        if street_info&.dig('logradouro')
+          row['Destination Address'] = "#{street_info['logradouro']},#{row['Destination Address'].split(',', 2).last}"
+        end
       end
     end
 
