@@ -104,14 +104,23 @@ class AddressProcessor
   end
 
   def geocode_address(row, full_address, zip_code, neighborhood, city)
-    parts = full_address.split(',')
-    street_name = parts.first&.strip
-    house_number = parts[1]&.strip&.split&.first
+    street_name, house_number = extract_street_and_number(full_address)
     return unless street_name && house_number
 
     location = fetch_location(street_name, house_number, zip_code, neighborhood, city)
     return unless location
 
+    update_row_with_location(row, location)
+  end
+
+  def extract_street_and_number(full_address)
+    parts = full_address.split(',')
+    street_name = parts.first&.strip
+    house_number = parts[1]&.strip&.split&.first
+    [street_name, house_number]
+  end
+
+  def update_row_with_location(row, location)
     row['Latitude'] = location['lat'].to_s
     row['Longitude'] = location['lng'].to_s
   end
