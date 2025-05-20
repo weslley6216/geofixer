@@ -4,26 +4,9 @@ class LogGeneratorService
   class << self
     def save_logs_to_file(log_file, address_log_lines, street_log_lines, alley_log_lines)
       File.open(log_file, 'w:UTF-8') do |file|
-        file.puts 'Endereços com mais pedidos:'
-        file.puts ''
-        address_log_lines.each do |log_line|
-          file.puts log_line
-          file.puts '---------------------------------'
-        end
-
-        file.puts "\nRuas com mais pedidos:"
-        file.puts ''
-        street_log_lines.each do |log_line|
-          file.puts log_line
-          file.puts '---------------------------------'
-        end
-
-        file.puts "\nTravessas e/ou Passagens com mais pedidos:"
-        file.puts ''
-        alley_log_lines.each do |log_line|
-          file.puts log_line
-          file.puts '---------------------------------'
-        end
+        write_log_section(file, 'Endereços com mais pedidos:', address_log_lines)
+        write_log_section(file, 'Ruas com mais pedidos:', street_log_lines)
+        write_log_section(file, 'Travessas e/ou Passagens com mais pedidos:', alley_log_lines)
       end
       Utils::Logger.info("Logs saved to file: #{log_file}")
     end
@@ -39,5 +22,18 @@ class LogGeneratorService
     end
 
     def pluralize(count, singular, plural) = count == 1 ? singular : plural
+
+    private
+
+    def write_log_section(file, title, log_lines)
+      return if log_lines.empty?
+
+      file.puts "\n#{title}"
+      file.puts ''
+      log_lines.each do |log_line|
+        file.puts log_line
+        file.puts '---------------------------------'
+      end
+    end
   end
 end
