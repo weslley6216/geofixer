@@ -35,6 +35,12 @@ RSpec.describe Web::App do
     expect(last_response.body).to include('Processar')
   end
 
+  it 'serves the stylesheet' do
+    get '/style.css'
+    expect(last_response).to be_ok
+    expect(last_response.headers['Content-Type']).to include('css')
+  end
+
   it 'accepts an xlsx upload, creates a job and enqueues it' do
     xlsx = write_xlsx([%w[Sequence Address], ['1', 'Rua A, 10']])
     post '/upload', file: Rack::Test::UploadedFile.new(xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

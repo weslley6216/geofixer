@@ -14,6 +14,7 @@ module Web
 
     configure do
       set :views, File.expand_path('views', __dir__)
+      set :public_folder, File.expand_path('public', __dir__)
       enable :logging
       # Served behind Render's proxy on a dynamic hostname and guarded by Basic
       # Auth, so Sinatra's host allow-list only gets in the way here.

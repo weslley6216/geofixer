@@ -1,0 +1,159 @@
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --border: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #a3e635;
+  --accent-press: #84cc16;
+  --error: #f87171;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 26rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+}
+
+h1 .pin { color: var(--accent); }
+
+.subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  border: 2px dashed var(--border);
+  border-radius: 0.9rem;
+  padding: 1.75rem 1rem;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.dropzone:hover,
+.dropzone:focus-within {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(163, 230, 53, 0.05);
+}
+
+.dropzone .icon { font-size: 1.6rem; }
+.dropzone strong { color: var(--text); }
+
+.dropzone input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.filename {
+  margin: 0.75rem 0 0;
+  min-height: 1.2em;
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-align: center;
+  word-break: break-all;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: var(--accent);
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:active { background: var(--accent-press); }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.muted { color: var(--muted); }
+.error { color: var(--error); }
+
+.status-line {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.progress {
+  height: 0.6rem;
+  margin: 1rem 0 0.5rem;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.65; }
+}
+
+.downloads {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.back {
+  display: inline-block;
+  margin-top: 1.25rem;
+}
+
+a { color: var(--accent); }

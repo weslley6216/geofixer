@@ -5,25 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <% if %i[queued running].include?(@job.status) %><meta http-equiv="refresh" content="2"><% end %>
   <title>Geofixer</title>
-  <style>body { font-family: system-ui, sans-serif; max-width: 30rem; margin: 2rem auto; padding: 0 1rem; }</style>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <h1>Geofixer</h1>
-  <% case @job.status
-     when :queued, :running %>
-    <% if @job.total.to_i.positive? %>
-      <p>⏳ Processando… <%= @job.processed.to_i %>/<%= @job.total %> endereços (<%= (100.0 * @job.processed.to_i / @job.total).round %>%)</p>
-    <% else %>
-      <p>⏳ Processando… a página atualiza sozinha.</p>
+  <main class="card">
+    <h1><span class="pin">📍</span> Geofixer</h1>
+
+    <% case @job.status
+       when :queued, :running %>
+      <p class="status-line">⏳ Processando…</p>
+      <% if @job.total.to_i.positive?
+           pct = (100.0 * @job.processed.to_i / @job.total).round %>
+        <div class="progress"><div class="progress__bar" style="width: <%= pct %>%"></div></div>
+        <p class="muted"><%= @job.processed.to_i %>/<%= @job.total %> endereços (<%= pct %>%)</p>
+      <% else %>
+        <div class="progress"><div class="progress__bar" style="width: 8%"></div></div>
+        <p class="muted">a página atualiza sozinha</p>
+      <% end %>
+    <% when :done %>
+      <p class="status-line">✅ Pronto!</p>
+      <div class="downloads">
+        <a class="btn" href="/jobs/<%= @job.id %>/download/csv">⬇ Baixar CSV</a>
+        <a class="btn btn--ghost" href="/jobs/<%= @job.id %>/download/log">⬇ Baixar log</a>
+      </div>
+      <a class="back" href="/">← Processar outro</a>
+    <% when :failed %>
+      <p class="status-line error">❌ Falhou</p>
+      <p class="muted"><%= @job.error %></p>
+      <a class="back" href="/">← Voltar</a>
     <% end %>
-  <% when :done %>
-    <p>✅ Pronto!</p>
-    <p><a href="/jobs/<%= @job.id %>/download/csv">Baixar CSV</a></p>
-    <p><a href="/jobs/<%= @job.id %>/download/log">Baixar log</a></p>
-    <p><a href="/">Processar outro</a></p>
-  <% when :failed %>
-    <p>❌ Falhou: <%= @job.error %></p>
-    <p><a href="/">Voltar</a></p>
-  <% end %>
+  </main>
 </body>
 </html>

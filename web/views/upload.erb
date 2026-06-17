@@ -4,19 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Geofixer</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 30rem; margin: 2rem auto; padding: 0 1rem; }
-    button { font-size: 1.1rem; padding: 0.6rem 1.2rem; margin-top: 1rem; }
-    input[type=file] { font-size: 1rem; }
-    .error { color: #b00; }
-  </style>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <h1>Geofixer</h1>
-  <% if @error %><p class="error"><%= @error %></p><% end %>
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".xlsx" required>
-    <button type="submit">Processar</button>
-  </form>
+  <main class="card">
+    <h1><span class="pin">📍</span> Geofixer</h1>
+    <p class="subtitle">Envie sua planilha de endereços</p>
+
+    <% if @error %><p class="error"><%= @error %></p><% end %>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <label class="dropzone">
+        <span class="icon">⬆</span>
+        <span><strong>Escolher arquivo</strong> .xlsx</span>
+        <input type="file" name="file" accept=".xlsx" required>
+      </label>
+      <p class="filename" id="filename"></p>
+      <button class="btn" type="submit">Processar →</button>
+    </form>
+  </main>
+
+  <script>
+    const input = document.querySelector('input[type=file]');
+    const filename = document.getElementById('filename');
+    input.addEventListener('change', () => {
+      filename.textContent = input.files[0] ? input.files[0].name : '';
+    });
+  </script>
 </body>
 </html>
