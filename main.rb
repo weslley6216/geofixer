@@ -15,6 +15,7 @@ class Main
   DESTINATION_FOLDER_ID = ENV['DESTINATION_FOLDER_ID']
   LAST_CHECKED_FILE = ENV['LAST_CHECKED_FILE']
   XLSX_MIME_TYPE = ENV['XLSX_MIME_TYPE']
+  OUTPUT_LABEL = ENV.fetch('OUTPUT_LABEL', 'Andreia Eslava')
 
   def initialize
     @logger = Utils::Logger
@@ -65,29 +66,29 @@ class Main
     file_path = "files/#{file.name}"
     @downloader.download(file.id, file_path)
 
-    csv_path = 'files/arquivo.csv'
+    csv_path = "files/#{file.id}.csv"
     convert_xlsx_to_csv(file_path, csv_path)
 
     date_today = Date.today.strftime('%d-%m-%Y')
-    output_file = "files/#{date_today} Andreia Eslava.csv"
-    log_file = "files/#{date_today} log_enderecos.txt"
-
-    processor = AddressProcessor.new(csv_path, output_file, log_file)
+    processor = AddressProcessor.new(csv_path, output_csv_path(date_today), output_log_path(date_today))
     processor.process_file
 
     upload_results(date_today)
     cleanup_files(file_path, csv_path)
   end
 
+  def output_csv_path(date) = "files/#{date} #{OUTPUT_LABEL}.csv"
+  def output_log_path(date) = "files/#{date} log_enderecos.txt"
+
   def convert_xlsx_to_csv(xlsx_path, csv_path)
     xlsx = Roo::Spreadsheet.open(xlsx_path)
-    CSV.open(csv_path, 'wb') { |csv| xlsx.sheet(0).each_row_streaming { |row| csv << row.map(&:value) } }
+    CSV.open(csv_path, 'w', encoding: 'UTF-8') { |csv| xlsx.sheet(0).each_row_streaming { |row| csv << row.map(&:value) } }
   end
 
   def upload_results(date_today)
     output_files = {
-      '📊 CSV file' => "files/#{date_today} Andreia Eslava.csv",
-      '📝 Log file' => "files/#{date_today} log_enderecos.txt"
+      '📊 CSV file' => output_csv_path(date_today),
+      '📝 Log file' => output_log_path(date_today)
     }
 
     output_files.each do |desc, path|
@@ -131,25 +132,14 @@ class Main
 
   def log_success(message) = @logger.info("✅ #{message}")
   def log_warning(message) = @logger.warn("⚠️ #{message}")
-  def log_error(message) = @logger.error("❌ #{message}")
   def format_time(time) = time.strftime('%d/%m/%Y %H:%M:%S')
 end
 
 begin
-  logger = Utils::Logger
-  logger.info('=' * 70)
-  logger.info('ADDRESS PROCESSOR - START OF EXECUTION')
-  logger.info('=' * 70)
-
   Main.new.run
-
-  logger.info('=' * 70)
-  logger.info('Processing completed')
-  logger.info('=' * 70)
 rescue StandardError => e
-  logger.error("\n💥 FATAL ERROR: #{e.message}")
-  logger.error('Backtrace:')
-  logger.error(e.backtrace.first(5).join("\n"))
-  logger.info('=' * 70)
+  Utils::Logger.error("\n💥 FATAL ERROR: #{e.message}")
+  Utils::Logger.error('Backtrace:')
+  Utils::Logger.error(e.backtrace.first(5).join("\n"))
   exit 1
 end
