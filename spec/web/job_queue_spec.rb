@@ -25,6 +25,19 @@ RSpec.describe JobQueue do
     expect(job.log_path).to eq('/tmp/x.txt')
   end
 
+  it 'forwards progress updates from the runner to the registry' do
+    runner = double('runner')
+    allow(runner).to receive(:run).and_yield(3, 10).and_yield(10, 10).and_return(['/tmp/x.csv', '/tmp/x.txt'])
+    queue = described_class.new(registry, runner)
+    registry.create('jobp')
+
+    queue.enqueue('jobp', '/tmp/jobp')
+    wait_until { registry.fetch('jobp').status == :done }
+
+    expect(registry.fetch('jobp').processed).to eq(10)
+    expect(registry.fetch('jobp').total).to eq(10)
+  end
+
   it 'marks the job failed when the runner raises' do
     allow(Utils::Logger).to receive(:warn)
     runner = double('runner')

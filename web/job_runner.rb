@@ -11,7 +11,7 @@ class JobRunner
     @output_label = output_label
   end
 
-  def run(dir)
+  def run(dir, &on_progress)
     csv_path = File.join(dir, 'input.csv')
     XlsxConverter.convert(File.join(dir, 'input.xlsx'), csv_path)
 
@@ -19,7 +19,7 @@ class JobRunner
     output_csv = File.join(dir, "#{date} #{@output_label}.csv")
     output_log = File.join(dir, "#{date} log_enderecos.txt")
 
-    AddressProcessor.new(csv_path, output_csv, output_log).process_file
+    AddressProcessor.new(csv_path, output_csv, output_log, on_progress: on_progress).process_file
     [output_csv, output_log]
   end
 end

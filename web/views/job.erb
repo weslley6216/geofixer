@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <% if %i[queued running].include?(@job.status) %><meta http-equiv="refresh" content="3"><% end %>
+  <% if %i[queued running].include?(@job.status) %><meta http-equiv="refresh" content="2"><% end %>
   <title>Geofixer</title>
   <style>body { font-family: system-ui, sans-serif; max-width: 30rem; margin: 2rem auto; padding: 0 1rem; }</style>
 </head>
@@ -11,7 +11,11 @@
   <h1>Geofixer</h1>
   <% case @job.status
      when :queued, :running %>
-    <p>⏳ Processando… a página atualiza sozinha.</p>
+    <% if @job.total.to_i.positive? %>
+      <p>⏳ Processando… <%= @job.processed.to_i %>/<%= @job.total %> endereços (<%= (100.0 * @job.processed.to_i / @job.total).round %>%)</p>
+    <% else %>
+      <p>⏳ Processando… a página atualiza sozinha.</p>
+    <% end %>
   <% when :done %>
     <p>✅ Pronto!</p>
     <p><a href="/jobs/<%= @job.id %>/download/csv">Baixar CSV</a></p>

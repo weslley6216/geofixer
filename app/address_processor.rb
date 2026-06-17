@@ -22,10 +22,11 @@ class AddressProcessor
   NUMERIC_COLUMNS = [SEQUENCE_COLUMN, STOP_COLUMN].freeze
   CSV_ENCODING = 'bom|utf-8'
 
-  def initialize(input_file, output_file, log_file)
+  def initialize(input_file, output_file, log_file, on_progress: nil)
     @input_file = input_file
     @output_file = output_file
     @log_file = log_file
+    @on_progress = on_progress
   end
 
   def process_file
@@ -34,19 +35,22 @@ class AddressProcessor
     address_count = Hash.new { |h, k| h[k] = { count: 0, sequences: [] } }
     street_count  = Hash.new { |h, k| h[k] = { count: 0, sequences: [] } }
 
+    total = count_rows
+    processed = 0
+    report_progress(processed, total)
+
     CSV.open(@output_file, 'w:UTF-8', col_sep: ',') do |csv|
       new_headers = build_headers
       csv << new_headers
       Utils::Logger.info('Header processed and written to output file.')
 
       CSV.foreach(@input_file, headers: true, col_sep: ',', encoding: CSV_ENCODING) do |row|
-        next unless row[ZIP_CODE_COLUMN]
+        if row[ZIP_CODE_COLUMN] && (processed_row = process_row(row.to_hash))
+          update_counts(processed_row, address_count, street_count)
+          write_row_to_csv(processed_row, csv, new_headers)
+        end
 
-        processed_row = process_row(row.to_hash)
-        next unless processed_row
-
-        update_counts(processed_row, address_count, street_count)
-        write_row_to_csv(processed_row, csv, new_headers)
+        report_progress(processed += 1, total)
       end
     end
 
@@ -61,6 +65,14 @@ class AddressProcessor
   def build_headers
     headers = CSV.open(@input_file, 'r', col_sep: ',', encoding: CSV_ENCODING, &:first)
     headers.insert(headers.index(ADDRESS_COLUMN) + 1, COMPLEMENT_COLUMN)
+  end
+
+  def count_rows
+    CSV.foreach(@input_file, headers: true, col_sep: ',', encoding: CSV_ENCODING).count
+  end
+
+  def report_progress(processed, total)
+    @on_progress&.call(processed, total)
   end
 
   def normalize_for_cache(*address_parts)

@@ -25,7 +25,9 @@ class JobQueue
 
   def process(job_id, dir)
     @registry.update(job_id, status: :running)
-    csv_path, log_path = @runner.run(dir)
+    csv_path, log_path = @runner.run(dir) do |processed, total|
+      @registry.update(job_id, processed: processed, total: total)
+    end
     @registry.update(job_id, status: :done, csv_path: csv_path, log_path: log_path)
   rescue StandardError => e
     Utils::Logger.warn("Job #{job_id} failed: #{e.message}")

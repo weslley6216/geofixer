@@ -115,5 +115,20 @@ RSpec.describe AddressProcessor do
       expect(output.first['Destination Address']).to eq('Rua Fictícia, 123')
       expect(output.first['Latitude']).to eq('-23.55052')
     end
+
+    it 'reports progress through the on_progress callback as rows are processed' do
+      CSV.open(input_file, 'w', col_sep: ',') do |csv|
+        csv << ['Sequence', 'Stop', 'Destination Address', 'Zipcode/Postal code', 'Bairro', 'City', 'Latitude', 'Longitude']
+        csv << ['1', '1', 'Rua Fictícia, 123', '12345678', 'Centro', 'São Paulo', '', '']
+        csv << ['2', '2', 'Rua Fictícia, 456', '12345678', 'Centro', 'São Paulo', '', '']
+      end
+      progress = []
+
+      described_class.new(input_file, output_file, log_file,
+                          on_progress: ->(done, total) { progress << [done, total] }).process_file
+
+      expect(progress.first).to eq([0, 2])
+      expect(progress.last).to eq([2, 2])
+    end
   end
 end

@@ -13,7 +13,7 @@ RSpec.describe JobRunner do
     write_xlsx([%w[Sequence Address], ['1', 'Rua A, 10']], File.join(dir, 'input.xlsx'))
 
     fake_processor = instance_double(AddressProcessor, process_file: nil)
-    expect(AddressProcessor).to receive(:new) do |input, output_csv, output_log|
+    expect(AddressProcessor).to receive(:new) do |input, output_csv, output_log, **|
       expect(input).to eq(File.join(dir, 'input.csv'))
       expect(output_csv).to match(%r{/\d{2}-\d{2}-\d{4} Andreia Eslava\.csv$})
       expect(output_log).to match(%r{/\d{2}-\d{2}-\d{4} log_enderecos\.txt$})

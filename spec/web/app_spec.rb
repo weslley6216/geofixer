@@ -63,6 +63,14 @@ RSpec.describe Web::App do
     expect(last_response.status).to eq(404)
   end
 
+  it 'shows how many addresses were processed while running' do
+    registry.create('abc')
+    registry.update('abc', status: :running, processed: 40, total: 100)
+
+    get '/jobs/abc'
+    expect(last_response.body).to include('40/100')
+  end
+
   it 'serves the csv download when the job is done' do
     path = File.join(Dir.mktmpdir, 'out.csv')
     File.write(path, "col\n")

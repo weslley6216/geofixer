@@ -5,7 +5,8 @@ require 'monitor'
 # Thread-safe in-memory map of job id -> Job. Holds the lifecycle status and
 # the result file paths. No persistence: jobs are transient.
 class JobRegistry
-  Job = Struct.new(:id, :status, :csv_path, :log_path, :error, :created_at, keyword_init: true)
+  Job = Struct.new(:id, :status, :csv_path, :log_path, :error, :created_at, :processed, :total,
+                   keyword_init: true)
 
   def initialize
     @jobs = {}
