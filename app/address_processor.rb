@@ -14,7 +14,6 @@ class AddressProcessor
     @input_file = input_file
     @output_file = output_file
     @log_file = log_file
-    @zip_code_cache = {}
   end
 
   def process_file
@@ -54,7 +53,7 @@ class AddressProcessor
 
   def fetch_street_name_from_zip_code(zip_code)
     Utils::CacheManager.fetch_zip_code(zip_code) ||
-      ZipCodeService.fetch_street_name_from_zip_code(zip_code, @zip_code_cache).tap do |zip_code_info|
+      ZipCodeService.fetch_street_name_from_zip_code(zip_code).tap do |zip_code_info|
         Utils::CacheManager.store_zip_code(zip_code, zip_code_info) if zip_code_info
       end
   end
@@ -90,7 +89,7 @@ class AddressProcessor
       row['Destination Address'] = "#{zip_code_info[:street_name]},#{row['Destination Address'].split(',', 2).last}"
     else
       Utils::Logger.warn("Trying to correct street name: #{input_street}")
-      if (street_info = ZipCodeService.fetch_zip_code_by_street_name(input_street, zip_code_info[:city]))
+      if (street_info = ZipCodeService.fetch_zip_code_by_street_name(input_street, zip_code_info[:city], zip_code_info[:uf]))
         street_info = street_info.first if street_info.is_a?(Array)
 
         if street_info&.dig('logradouro')

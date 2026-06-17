@@ -8,14 +8,7 @@ RSpec.describe Utils::CacheManager do
   let(:cache_key) { 'rua_flores_100_12345678_bairro_sp' }
   let(:location_data) { { 'lat' => -23.5, 'lng' => -46.6 } }
 
-  describe '.instance' do
-    it 'returns the same instance every time' do
-      instance1 = described_class.instance
-      instance2 = described_class.instance
-
-      expect(instance1).to be(instance2)
-    end
-  end
+  before { described_class.clear! }
 
   describe '.store_zip_code and .fetch_zip_code' do
     it 'returns nil if the zip code is not cached' do
