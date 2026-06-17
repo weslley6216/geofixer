@@ -72,7 +72,7 @@ RSpec.describe ZipCodeService do
       end
 
       it 'does not make an HTTP request to ViaCEP' do
-        expect(HTTParty).not_to receive(:get)
+        expect(Utils::HttpClient).not_to receive(:get_json)
         ZipCodeService.fetch_street_name_from_zip_code(zip_code, cache)
       end
     end

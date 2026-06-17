@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'httparty'
 require 'uri'
+require_relative '../utils/http_client'
 
 class GoogleGeocodingService
   def initialize(api_key = ENV['GOOGLE_API_KEY'])
@@ -17,11 +17,8 @@ class GoogleGeocodingService
 
   def fetch_geocode(address)
     url = "https://maps.googleapis.com/maps/api/geocode/json?address=#{URI::DEFAULT_PARSER.escape(address)}&key=#{@api_key}"
-    response = HTTParty.get(url)
-    return unless response.code == 200
-
-    data = response.parsed_response
-    return unless data['results']&.any?
+    data = Utils::HttpClient.get_json(url)
+    return unless data && data['results']&.any?
 
     data['results'].first['geometry']['location']
   end

@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
-require 'httparty'
 require 'uri'
+require_relative '../utils/http_client'
 
 class ZipCodeService
   class << self
     def fetch_street_name_from_zip_code(zip_code, cache)
       cache.fetch(zip_code) do
-        response = HTTParty.get(viacep_url(zip_code))
-        next unless response.success?
-
-        data = response.parsed_response
+        data = Utils::HttpClient.get_json(viacep_url(zip_code))
+        next unless data
         next if data['erro']
 
         cache_zip_data(cache, zip_code, data)
@@ -21,8 +19,7 @@ class ZipCodeService
       url = street_search_url(street_name, city)
       Utils::Logger.info("Fetching URL: #{url}")
 
-      response = HTTParty.get(url)
-      response.success? ? response.parsed_response : nil
+      Utils::HttpClient.get_json(url)
     end
 
     private
