@@ -86,5 +86,33 @@ RSpec.describe AddressProcessor do
 
       processor.process_file
     end
+
+    it 'corrects the street name via ViaCEP search when it does not match the zip lookup' do
+      allow(ZipCodeService).to receive(:fetch_street_name_from_zip_code)
+        .and_return({ street_name: 'Rua Oficial', city: 'São Paulo', uf: 'SP' })
+
+      unmatched = instance_double(AddressNormalizerService, street_name_matches?: false,
+                                                            separate_complement: ['Rua Corrigida, 123', nil])
+      allow(AddressNormalizerService).to receive(:new).and_return(unmatched)
+
+      expect(ZipCodeService).to receive(:fetch_zip_code_by_street_name)
+        .with('Rua Fictícia', 'São Paulo', 'SP')
+        .and_return([{ 'logradouro' => 'Rua Corrigida' }])
+
+      processor.process_file
+
+      output = CSV.read(output_file, headers: true, col_sep: ',')
+      expect(output.first['Destination Address']).to eq('Rua Corrigida, 123')
+    end
+
+    it 'keeps the original address and still geocodes when the zip code is not found' do
+      allow(ZipCodeService).to receive(:fetch_street_name_from_zip_code).and_return(nil)
+
+      processor.process_file
+
+      output = CSV.read(output_file, headers: true, col_sep: ',')
+      expect(output.first['Destination Address']).to eq('Rua Fictícia, 123')
+      expect(output.first['Latitude']).to eq('-23.55052')
+    end
   end
 end
