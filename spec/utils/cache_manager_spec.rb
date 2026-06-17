@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'byebug'
 
 RSpec.describe Utils::CacheManager do
   let(:zip_code) { '12345678' }

@@ -3,6 +3,8 @@
 
 /logs
 
+/files
+
 /tmp
 
 .byebug_history
