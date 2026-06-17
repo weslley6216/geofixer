@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'fileutils'
 
 RSpec.describe AddressProcessor do
   let(:input_file) { 'spec/fixtures/input.csv' }
