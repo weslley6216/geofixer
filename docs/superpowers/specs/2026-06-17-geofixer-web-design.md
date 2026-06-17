@@ -27,8 +27,14 @@ reused unchanged.
 ## Architecture
 
 A single Ruby process running **Sinatra** (modular `Sinatra::Base`) behind
-**Puma**, with one **background worker thread** that processes jobs from a FIFO
-queue, one at a time.
+**Puma**, with one **in-process background thread** that processes jobs from a
+FIFO queue, one at a time.
+
+> **This is a thread inside the web process, not a separate Render Background
+> Worker** (those are not free). Everything — HTTP and processing — runs in one
+> Render free Web Service. This works because Render does not throttle CPU
+> between requests: the instance keeps running until it spins down after ~15 min
+> idle, and the status-page polling keeps it alive for the 1–2 min a job takes.
 
 ```
 phone ── GET /            ─▶ upload form (HTML, mobile-friendly)
@@ -54,7 +60,7 @@ Each is small, single-purpose, and testable in isolation.
 | Unit | Responsibility | Depends on |
 |------|----------------|------------|
 | `Web::App` (`Sinatra::Base`) | HTTP routes only: form, upload, status, download. No business logic. | `JobRegistry`, `JobQueue` |
-| `JobQueue` | FIFO queue + single worker thread; runs one job at a time; updates the registry. | `JobRunner` |
+| `JobQueue` | FIFO queue + single in-process thread (started at boot inside the web process); runs one job at a time; updates the registry. | `JobRunner` |
 | `JobRunner` | Process one job end to end: convert → `AddressProcessor` → record result paths; capture failures. | `XlsxConverter`, `AddressProcessor` |
 | `JobRegistry` | Thread-safe map `job_id → {status, csv_path, log_path, error}`. Mutex-guarded. | — |
 | `XlsxConverter` | `.xlsx → .csv` (extracted from the deleted `Main`). | `roo`, `csv` |
@@ -108,6 +114,8 @@ No `credentials.json` / `token.yml` / OAuth.
 
 ## Deploy (Render, free)
 
+- **One** Render free **Web Service** — no Background Worker, no cron, no Redis,
+  no database, no paid add-ons. The processing thread lives inside this service.
 - **Docker** image (`ruby:4.0.1` base) so the pinned Ruby version is honored
   regardless of Render's native runtimes. `config.ru` + Puma; `Dockerfile`
   installs gems and runs `bundle exec puma`.
