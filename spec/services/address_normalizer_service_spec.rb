@@ -43,16 +43,6 @@ RSpec.describe AddressNormalizerService do
     end
   end
 
-  describe '#normalize_address' do
-    it 'normalizes the address' do
-      service = AddressNormalizerService.new('Rua Água Funda, 10')
-
-      result = service.normalize_address
-
-      expect(result).to eq('rua_agua_funda_10')
-    end
-  end
-
   describe '#street_name_matches?' do
     it 'returns true if the street names match' do
       service = AddressNormalizerService.new('Rua da Paz, 10')
@@ -74,6 +64,14 @@ RSpec.describe AddressNormalizerService do
       service = AddressNormalizerService.new('Rua da Paz, 10')
 
       result = service.street_name_matches?('Rua da Alegria')
+
+      expect(result).to be false
+    end
+
+    it 'returns false when the streets only share a connector word' do
+      service = AddressNormalizerService.new('Rua das Flores, 10')
+
+      result = service.street_name_matches?('Rua das Pedras')
 
       expect(result).to be false
     end

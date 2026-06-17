@@ -20,7 +20,7 @@ RSpec.describe AddressProcessor do
     allow(ZipCodeService).to receive(:fetch_street_name_from_zip_code).and_return({ street_name: 'Rua Fictícia', city: 'São Paulo' })
     allow(ZipCodeService).to receive(:fetch_zip_code_by_street_name).and_return(nil)
 
-    normalizer_instance = instance_double(AddressNormalizerService, normalize_address: 'Rua Ficticia', street_name_matches?: true,
+    normalizer_instance = instance_double(AddressNormalizerService, street_name_matches?: true,
                                                                     separate_complement: ['Rua Fictícia, 123', nil])
     allow(AddressNormalizerService).to receive(:new).and_return(normalizer_instance)
 

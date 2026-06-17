@@ -3,6 +3,9 @@ require_relative '../utils/i18n'
 
 class AddressNormalizerService
   PREFIXES = %w[r rua av avenida tv travessa psg passagem pç praça].freeze
+  # Connector words that carry no distinguishing meaning when comparing street
+  # names. Shorter connectors (de/da/do/e) are already dropped as short words.
+  CONNECTORS = %w[das dos].freeze
 
   def initialize(address)
     @address = address
@@ -20,14 +23,11 @@ class AddressNormalizerService
 
   def remove_accents(string) = I18n.transliterate(string.downcase)
   def remove_very_short_words(string) = string.gsub(/\b[a-zA-Z]{1,2}\b,?\s*/, '').strip
-  def normalize_address = remove_accents(@address).gsub(/,\s*|\s+/, '_')
 
   def street_name_matches?(fetched_street)
-    input_cleaned = normalize_string(remove_very_short_words(remove_prefixes(@address)))
-    input_words = remove_punctuation(remove_accents(input_cleaned)).split
-
-    fetched_cleaned = normalize_string(remove_accents(fetched_street))
-    fetched_words = fetched_cleaned.split
+    input_words = significant_words(@address)
+    fetched_words = significant_words(fetched_street)
+    return false if input_words.empty? || fetched_words.empty?
 
     input_words.any? { |word| fetched_words.include?(word) }
   end
@@ -36,7 +36,13 @@ class AddressNormalizerService
 
   private
 
-  def normalize_string(string) = string.downcase.gsub("'", '')
+  # Distinguishing words of a street name: prefixes, short words, connectors,
+  # accents and punctuation removed.
+  def significant_words(string)
+    stripped = remove_very_short_words(remove_prefixes(string))
+    remove_punctuation(remove_accents(stripped)).split.reject { |word| CONNECTORS.include?(word) }
+  end
+
   def remove_punctuation(string) = string.gsub(/[^a-zA-Z0-9\s]/, '')
   def remove_prefixes(string) = string.split(' ').reject { |word| PREFIXES.include?(word.downcase) }.join(' ').strip
 end
