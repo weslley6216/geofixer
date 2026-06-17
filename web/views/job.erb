@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <% if %i[queued running].include?(@job.status) %><meta http-equiv="refresh" content="3"><% end %>
+  <title>Geofixer</title>
+  <style>body { font-family: system-ui, sans-serif; max-width: 30rem; margin: 2rem auto; padding: 0 1rem; }</style>
+</head>
+<body>
+  <h1>Geofixer</h1>
+  <% case @job.status
+     when :queued, :running %>
+    <p>⏳ Processando… a página atualiza sozinha.</p>
+  <% when :done %>
+    <p>✅ Pronto!</p>
+    <p><a href="/jobs/<%= @job.id %>/download/csv">Baixar CSV</a></p>
+    <p><a href="/jobs/<%= @job.id %>/download/log">Baixar log</a></p>
+    <p><a href="/">Processar outro</a></p>
+  <% when :failed %>
+    <p>❌ Falhou: <%= @job.error %></p>
+    <p><a href="/">Voltar</a></p>
+  <% end %>
+</body>
+</html>

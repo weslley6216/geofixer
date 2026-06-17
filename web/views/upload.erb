@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geofixer</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 30rem; margin: 2rem auto; padding: 0 1rem; }
+    button { font-size: 1.1rem; padding: 0.6rem 1.2rem; margin-top: 1rem; }
+    input[type=file] { font-size: 1rem; }
+    .error { color: #b00; }
+  </style>
+</head>
+<body>
+  <h1>Geofixer</h1>
+  <% if @error %><p class="error"><%= @error %></p><% end %>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xlsx" required>
+    <button type="submit">Processar</button>
+  </form>
+</body>
+</html>
