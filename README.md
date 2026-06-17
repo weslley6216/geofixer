@@ -42,7 +42,6 @@ Abra `http://localhost:3000`, faça login (Basic Auth) e envie o `.xlsx`.
 |----------|----------|
 | `GOOGLE_API_KEY` | Geocodificação no Google Maps |
 | `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` | Login do app (obrigatórios — o app não sobe sem eles) |
-| `OUTPUT_LABEL` | Rótulo no nome do arquivo de saída (padrão: `Andreia Eslava`) |
 | `PORT` | Porta do servidor (o Render injeta automaticamente) |
 
 ## ☁️ Deploy (Render, free)

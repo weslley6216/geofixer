@@ -98,7 +98,7 @@ than a TTL (default 60 min) to bound disk use. No database.
 |-----|---------|
 | `GOOGLE_API_KEY` | Geocoding (existing). |
 | `BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD` | App login. |
-| `OUTPUT_LABEL` | Output filename label (default `Andreia Eslava`). |
+| `OUTPUT_LABEL` | Output filename label (default `ROTA`). |
 | `PORT` | Provided by Render; Puma binds to it. |
 
 No `credentials.json` / `token.yml` / OAuth.

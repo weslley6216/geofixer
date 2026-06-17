@@ -10,6 +10,9 @@ RSpec.describe AddressProcessor do
   let(:processor) { described_class.new(input_file, output_file, log_file) }
 
   before do
+    FileUtils.mkdir_p('spec/fixtures')
+    FileUtils.mkdir_p('spec/tmp')
+
     CSV.open(input_file, 'w', col_sep: ',') do |csv|
       csv << ['Sequence', 'Stop', 'Destination Address', 'Zipcode/Postal code', 'Bairro', 'City', 'Latitude', 'Longitude']
       csv << ['1', '1', 'Rua Fictícia, 123', '12345678', 'Centro', 'São Paulo', '-123', '-456']

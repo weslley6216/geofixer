@@ -15,7 +15,7 @@ RSpec.describe JobRunner do
     fake_processor = instance_double(AddressProcessor, process_file: nil)
     expect(AddressProcessor).to receive(:new) do |input, output_csv, output_log, **|
       expect(input).to eq(File.join(dir, 'input.csv'))
-      expect(output_csv).to match(%r{/\d{2}-\d{2}-\d{4} Andreia Eslava\.csv$})
+      expect(output_csv).to match(%r{/\d{2}-\d{2}-\d{4} ROTA\.csv$})
       expect(output_log).to match(%r{/\d{2}-\d{2}-\d{4} log_enderecos\.txt$})
       fake_processor
     end
@@ -23,7 +23,7 @@ RSpec.describe JobRunner do
     csv_path, log_path = described_class.new.run(dir)
 
     expect(File.exist?(File.join(dir, 'input.csv'))).to be true
-    expect(csv_path).to end_with('Andreia Eslava.csv')
+    expect(csv_path).to end_with('ROTA.csv')
     expect(log_path).to end_with('log_enderecos.txt')
   end
 end

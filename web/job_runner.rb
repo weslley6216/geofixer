@@ -7,7 +7,7 @@ require_relative '../app/address_processor'
 # Runs one upload to completion: convert the xlsx, then process it with the
 # Phase 1 core. Returns [csv_path, log_path] of the generated results.
 class JobRunner
-  def initialize(output_label: ENV.fetch('OUTPUT_LABEL', 'Andreia Eslava'))
+  def initialize(output_label: ENV.fetch('OUTPUT_LABEL', 'ROTA'))
     @output_label = output_label
   end
 
