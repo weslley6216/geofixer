@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: geofixer
+    runtime: docker
+    plan: free
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: BASIC_AUTH_USER
+        sync: false
+      - key: BASIC_AUTH_PASSWORD
+        sync: false
+      - key: OUTPUT_LABEL
+        sync: false

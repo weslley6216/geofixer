@@ -1,0 +1,9 @@
+.git
+tmp
+files
+logs
+spec
+docs
+.env
+config/credentials.json
+config/token.yml
