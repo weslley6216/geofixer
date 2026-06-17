@@ -5,71 +5,48 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     base64 (0.3.0)
     bigdecimal (3.1.9)
+    caxlsx (4.5.0)
+      htmlentities (~> 4.3, >= 4.3.4)
+      marcel (~> 1.0)
+      nokogiri (~> 1.10, >= 1.10.4)
+      rubyzip (>= 2.4, < 4)
     concurrent-ruby (1.3.6)
     crack (1.0.0)
       bigdecimal
       rexml
     csv (3.3.3)
-    declarative (0.0.20)
     diff-lcs (1.6.1)
     dotenv (3.1.8)
-    faraday (2.14.0)
-      faraday-net_http (>= 2.0, < 3.5)
-      json
-      logger
-    faraday-net_http (3.4.2)
-      net-http (~> 0.5)
-    google-apis-core (0.18.0)
-      addressable (~> 2.5, >= 2.5.1)
-      googleauth (~> 1.9)
-      httpclient (>= 2.8.3, < 3.a)
-      mini_mime (~> 1.0)
-      mutex_m
-      representable (~> 3.0)
-      retriable (>= 2.0, < 4.a)
-    google-apis-drive_v3 (0.76.0)
-      google-apis-core (>= 0.15.0, < 2.a)
-    google-cloud-env (2.3.1)
-      base64 (~> 0.2)
-      faraday (>= 1.0, < 3.a)
-    google-logging-utils (0.2.0)
-    googleauth (1.16.1)
-      faraday (>= 1.0, < 3.a)
-      google-cloud-env (~> 2.2)
-      google-logging-utils (~> 0.1)
-      jwt (>= 1.4, < 4.0)
-      multi_json (~> 1.11)
-      os (>= 0.9, < 2.0)
-      signet (>= 0.16, < 2.a)
     hashdiff (1.1.2)
-    httpclient (2.9.0)
-      mutex_m
+    htmlentities (4.4.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    json (2.10.2)
-    jwt (3.1.2)
-      base64
     logger (1.7.0)
-    mini_mime (1.1.5)
+    marcel (1.2.1)
     mini_portile2 (2.8.9)
-    multi_json (1.19.1)
-    mutex_m (0.3.0)
-    net-http (0.9.1)
-      uri (>= 0.11.1)
+    mustermann (3.1.1)
+    nio4r (2.7.5)
     nokogiri (1.19.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     nokogiri (1.19.0-x86_64-linux-gnu)
       racc (~> 1.4)
-    os (1.1.4)
-    pstore (0.2.0)
     public_suffix (6.0.1)
+    puma (8.0.2)
+      nio4r (~> 2.0)
     racc (1.8.1)
-    representable (3.2.0)
-      declarative (< 0.1.0)
-      trailblazer-option (>= 0.1.1, < 0.2.0)
-      uber (< 0.2.0)
-    retriable (3.1.2)
+    rack (3.2.6)
+    rack-protection (4.2.1)
+      base64 (>= 0.1.0)
+      logger (>= 1.6.0)
+      rack (>= 3.0.0, < 4)
+    rack-session (2.1.2)
+      base64 (>= 0.1.0)
+      rack (>= 3.0.0)
+    rack-test (2.2.0)
+      rack (>= 1.3)
+    rackup (2.3.1)
+      rack (>= 3)
     rexml (3.4.1)
     roo (3.0.0)
       base64 (~> 0.2)
@@ -91,14 +68,14 @@ GEM
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
     rubyzip (3.2.2)
-    signet (0.21.0)
-      addressable (~> 2.8)
-      faraday (>= 0.17.5, < 3.a)
-      jwt (>= 1.5, < 4.0)
-      multi_json (~> 1.10)
-    trailblazer-option (0.1.2)
-    uber (0.1.0)
-    uri (1.1.1)
+    sinatra (4.2.1)
+      logger (>= 1.6.0)
+      mustermann (~> 3.0)
+      rack (>= 3.0.0, < 4)
+      rack-protection (= 4.2.1)
+      rack-session (>= 2.0.0, < 3)
+      tilt (~> 2.0)
+    tilt (2.7.0)
     webmock (3.25.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -109,14 +86,16 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  caxlsx
   csv
   dotenv
-  google-apis-drive_v3
-  googleauth
   i18n
-  pstore
+  puma
+  rack-test
+  rackup
   roo
   rspec
+  sinatra
   webmock
 
 RUBY VERSION

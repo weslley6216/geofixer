@@ -6,13 +6,15 @@ ruby file: '.tool-versions'
 
 gem 'csv'
 gem 'dotenv'
-gem 'google-apis-drive_v3'
-gem 'googleauth'
 gem 'i18n'
-gem 'pstore'
+gem 'puma'
+gem 'rackup'
 gem 'roo'
+gem 'sinatra'
 
 group :test do
+  gem 'caxlsx'
+  gem 'rack-test'
   gem 'rspec'
   gem 'webmock'
 end
