@@ -1,26 +1,66 @@
 # Geofixer
 
-Este é um projeto pessoal criado para automatizar o tratamento de arquivos de endereços que uso nas minhas entregas de pacotes. Ele facilita bastante a organização dos dados, corrigindo informações e padronizando os arquivos que recebo.
+Projeto pessoal para tratar arquivos de endereços que uso nas minhas entregas de
+pacotes. É um web app: você **envia um `.xlsx` pelo celular** e baixa de volta um
+`.csv` corrigido e padronizado, pronto pro roteirizador, junto de um log com os
+endereços/ruas de maior volume.
 
 ## 🚚 O que ele faz?
 
-- Lê arquivos `.xlsx` com endereços enviados para uma pasta no Google Drive.
-- Corrige nomes de ruas com base no CEP usando a API do ViaCEP.
-- Obtém a **geolocalização (latitude e longitude)** usando a API do Google Maps.
-- Separa o complemento do endereço principal (ex: "apto", "fundos", etc).
-- Gera um novo arquivo `.csv` pronto para ser usado em sistemas de rota.
-- Envia o `.csv` de volta para o Google Drive e remove os arquivos locais.
-- Tudo isso acontece automaticamente graças a uma **cron job** que roda a cada 5 minutos e verifica se há novos arquivos na pasta do Google Drive.
+- Recebe um `.xlsx` de endereços por upload (de qualquer lugar, pelo navegador).
+- Corrige nomes de ruas com base no CEP usando a API do **ViaCEP**.
+- Obtém a **geolocalização (latitude e longitude)** via API do **Google Maps**.
+- Separa o complemento do endereço principal (ex: "apto", "fundos").
+- Gera um `.csv` pronto para sistemas de rota.
+- Gera um **log** com os endereços, ruas e travessas/passagens de maior volume,
+  que ajuda a priorizar entregas e organizar os pacotes no veículo.
+
+O processamento é **assíncrono**: o upload entra numa fila, uma thread interna
+processa um arquivo por vez, e a página de status atualiza sozinha até os
+downloads ficarem prontos.
 
 ## 💡 Por que isso existe?
 
-Criei esse script porque comecei a lidar com muitos arquivos de endereços inconsistentes — nomes de ruas abreviados, CEPs incorretos ou informações incompletas. Isso causava problemas no roteirizador, que muitas vezes me levava para os lugares errados ou gerava rotas ineficientes.
+Os arquivos chegavam com nomes de ruas abreviados, CEPs errados ou dados
+incompletos, o que fazia o roteirizador me levar a lugares errados ou gerar
+rotas ineficientes. O Geofixer corrige e padroniza isso, e os logs me ajudam a
+economizar tempo, combustível e retrabalho.
 
-Além de corrigir e padronizar os dados, o script também gera arquivos de log que me ajudam a tomar decisões melhores no dia a dia. Com essas informações, por exemplo, consigo:
+## 🔧 Rodando localmente
 
-- Priorizar entregas em regiões com maior volume de pedidos.
-- Organizar os pacotes no veículo de forma mais lógica.
-- Economizar tempo, combustível e reduzir o retrabalho.
+```bash
+cp .env.example .env        # preencha as variáveis
+bundle install
+bundle exec puma -C config/puma.rb config.ru
+```
 
-No fim, tudo isso deixa o processo de entrega mais eficiente, confiável e menos estressante.
+Abra `http://localhost:3000`, faça login (Basic Auth) e envie o `.xlsx`.
 
+### Variáveis de ambiente
+
+| Variável | Para quê |
+|----------|----------|
+| `GOOGLE_API_KEY` | Geocodificação no Google Maps |
+| `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` | Login do app (obrigatórios — o app não sobe sem eles) |
+| `OUTPUT_LABEL` | Rótulo no nome do arquivo de saída (padrão: `Andreia Eslava`) |
+| `PORT` | Porta do servidor (o Render injeta automaticamente) |
+
+## ☁️ Deploy (Render, free)
+
+O app roda como **um único Render Web Service gratuito** via Docker — sem
+Background Worker, cron, banco ou Redis.
+
+1. Conecte o repositório no Render (ou use o `render.yaml` como blueprint).
+2. Tipo de serviço: **Docker**, plano **Free**.
+3. Configure os secrets: `GOOGLE_API_KEY`, `BASIC_AUTH_USER`,
+   `BASIC_AUTH_PASSWORD` (e opcionalmente `OUTPUT_LABEL`).
+
+A instância dorme quando ociosa; o primeiro acesso depois de um tempo tem um
+cold start de ~30–60s e depois normaliza. Por ser uso ocasional, não precisa de
+pinger mantendo-a acordada.
+
+## 🧪 Testes
+
+```bash
+bundle exec rspec
+```
