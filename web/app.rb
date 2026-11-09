@@ -15,6 +15,7 @@ module Web
     configure do
       set :views, File.expand_path('views', __dir__)
       set :public_folder, File.expand_path('public', __dir__)
+      mime_type :webmanifest, 'application/manifest+json'
       enable :logging
       # Served behind Render's proxy on a dynamic hostname and guarded by Basic
       # Auth, so Sinatra's host allow-list only gets in the way here.
@@ -24,7 +25,20 @@ module Web
       end
     end
 
-    use Rack::Auth::Basic, 'Geofixer' do |user, pass|
+    # Browsers fetch the web manifest (and its icons) without credentials, so
+    # the PWA install assets must stay reachable outside Basic Auth. They hold
+    # nothing sensitive.
+    class BasicAuthExceptPwaAssets < Rack::Auth::Basic
+      PUBLIC_PATHS = %r{\A/(?:manifest\.webmanifest|sw\.js|icons/[\w.-]+\.png)\z}
+
+      def call(env)
+        return @app.call(env) if PUBLIC_PATHS.match?(env['PATH_INFO'])
+
+        super
+      end
+    end
+
+    use BasicAuthExceptPwaAssets, 'Geofixer' do |user, pass|
       Rack::Utils.secure_compare(user.to_s, ENV['BASIC_AUTH_USER'].to_s) &
         Rack::Utils.secure_compare(pass.to_s, ENV['BASIC_AUTH_PASSWORD'].to_s)
     end

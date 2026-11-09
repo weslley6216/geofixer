@@ -5,6 +5,7 @@ ENV['BASIC_AUTH_PASSWORD'] = 'secret'
 
 require 'spec_helper'
 require 'rack/test'
+require 'json'
 require_relative '../support/xlsx_helper'
 require_relative '../../web/app'
 
@@ -39,6 +40,37 @@ RSpec.describe Web::App do
     get '/style.css'
     expect(last_response).to be_ok
     expect(last_response.headers['Content-Type']).to include('css')
+  end
+
+  describe 'PWA' do
+    it 'links the manifest and registers the service worker on the pages' do
+      get '/'
+      expect(last_response.body).to include('rel="manifest"', 'serviceWorker')
+    end
+
+    %w[/manifest.webmanifest /sw.js /icons/icon-192.png /icons/icon-512.png
+       /icons/apple-touch-icon.png /icons/favicon-32.png].each do |path|
+      it "serves #{path} without credentials" do
+        header 'Authorization', nil
+        get path
+        expect(last_response).to be_ok
+      end
+    end
+
+    it 'keeps the stylesheet behind Basic Auth' do
+      header 'Authorization', nil
+      get '/style.css'
+      expect(last_response.status).to eq(401)
+    end
+
+    it 'declares a valid manifest' do
+      header 'Authorization', nil
+      get '/manifest.webmanifest'
+      expect(last_response.headers['Content-Type']).to include('application/manifest+json')
+      manifest = JSON.parse(last_response.body)
+      expect(manifest).to include('display' => 'standalone', 'start_url' => '/')
+      expect(manifest['icons'].map { it['sizes'] }).to include('192x192', '512x512')
+    end
   end
 
   it 'accepts an xlsx upload, creates a job and enqueues it' do

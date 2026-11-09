@@ -6,6 +6,7 @@
   <% if %i[queued running].include?(@job.status) %><meta http-equiv="refresh" content="2"><% end %>
   <title>Geofixer</title>
   <link rel="stylesheet" href="/style.css">
+<%= erb :_pwa_head %>
 </head>
 <body>
   <main class="card">
